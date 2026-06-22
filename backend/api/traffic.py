@@ -8,7 +8,9 @@ POST /api/traffic/ingest     - Receive detections from AI engine
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+IST = timezone(timedelta(hours=5, minutes=30))
 from models.zones import CHENNAI_ZONES, ZONES_BY_ID
 from models.traffic import TrafficReading, VehicleCount
 from services.simulator import compute_congestion, compute_green_time
@@ -94,7 +96,7 @@ async def ingest_traffic(payload: IngestPayload, request: Request):
         congestion_score=score,
         green_time_seconds=green_time,
         queue_length_meters=round(queue, 1),
-        timestamp=datetime.now(),
+        timestamp=datetime.now(IST),
         camera_online=True,
     )
 
@@ -105,7 +107,7 @@ async def ingest_traffic(payload: IngestPayload, request: Request):
         "type": "traffic_update",
         "data": [r.model_dump(mode="json") for r in simulator.latest.values()],
         "alert": None,
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": datetime.now(IST).isoformat(),
     })
 
     return {"status": "ok", "zone_id": payload.zone_id, "total_vehicles": total}

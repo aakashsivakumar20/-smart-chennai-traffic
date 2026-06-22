@@ -7,7 +7,9 @@ When real YOLO cameras are connected, this gets replaced by live data.
 import asyncio
 import random
 import math
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+IST = timezone(timedelta(hours=5, minutes=30))
 from typing import Dict
 
 import httpx
@@ -28,7 +30,7 @@ MODERATE_HOURS = {10, 11, 12, 13, 14, 15, 16}
 
 def get_time_multiplier() -> float:
     """Returns traffic density multiplier based on time of day"""
-    hour = datetime.now().hour
+    hour = datetime.now(IST).hour
     if hour in PEAK_HOURS:
         return random.uniform(0.85, 1.0)
     elif hour in MODERATE_HOURS:
@@ -83,7 +85,7 @@ def generate_zone_reading(zone) -> TrafficReading:
     base = {"high": 160, "medium": 100, "low": 50}[zone.priority]
 
     # Add some wave-like variation using sine
-    wave = math.sin(datetime.now().timestamp() / 60) * 0.15
+    wave = math.sin(datetime.now(IST).timestamp() / 60) * 0.15
     effective = max(0.0, multiplier + wave)
 
     cars  = int(base * effective * random.uniform(0.7, 1.0))
@@ -114,7 +116,7 @@ def generate_zone_reading(zone) -> TrafficReading:
         congestion_score=score,
         green_time_seconds=green_time,
         queue_length_meters=round(queue, 1),
-        timestamp=datetime.now(),
+        timestamp=datetime.now(IST),
         camera_online=random.random() > 0.05,  # 95% uptime
     )
 
@@ -176,7 +178,7 @@ class TrafficSimulator:
                 "type": "traffic_update",
                 "data": readings,
                 "alert": alert,
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": datetime.now(IST).isoformat(),
             }
 
             await connection_manager.broadcast(payload)
@@ -198,12 +200,12 @@ class TrafficSimulator:
                     AlertType.CROWD: f"Abnormal vehicle crowding at {zone.name}",
                 }
                 return {
-                    "id": f"alert_{datetime.now().timestamp()}",
+                    "id": f"alert_{datetime.now(IST).timestamp()}",
                     "zone_id": zone.id,
                     "zone_name": zone.name,
                     "alert_type": alert_type,
                     "message": messages[alert_type],
                     "severity": "critical" if alert_type == AlertType.ACCIDENT else "warning",
-                    "timestamp": datetime.now().isoformat(),
+                    "timestamp": datetime.now(IST).isoformat(),
                 }
         return None

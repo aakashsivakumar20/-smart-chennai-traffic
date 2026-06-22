@@ -8,7 +8,9 @@ Free tier: 2,500 requests/day — with 12 zones every 10 min = 1,728/day.
 
 import httpx
 import random
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+IST = timezone(timedelta(hours=5, minutes=30))
 
 from config import settings
 from models.traffic import TrafficReading, VehicleCount, CongestionLevel
@@ -72,6 +74,6 @@ def flow_to_reading(zone: TrafficZone, flow: dict) -> TrafficReading:
         congestion_score=congestion_score,
         green_time_seconds=compute_green_time(total),
         queue_length_meters=queue,
-        timestamp=datetime.now(),
+        timestamp=datetime.now(IST),
         camera_online=True,
     )
