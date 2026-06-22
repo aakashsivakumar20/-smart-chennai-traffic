@@ -14,10 +14,10 @@
   .card {
     @apply bg-gray-900 border border-gray-800 rounded-xl p-4;
   }
-  .badge-low    { @apply bg-green-900 text-green-300 text-xs px-2 py-0.5 rounded-full font-medium; }
-  .badge-medium { @apply bg-yellow-900 text-yellow-300 text-xs px-2 py-0.5 rounded-full font-medium; }
-  .badge-high   { @apply bg-red-900 text-red-300 text-xs px-2 py-0.5 rounded-full font-medium; }
-  .badge-severe { @apply bg-red-950 text-red-200 text-xs px-2 py-0.5 rounded-full font-medium border border-red-800; }
+  .badge-low    { @apply bg-green-900/60 text-green-300 text-xs px-2 py-0.5 rounded-full font-medium border border-green-800; }
+  .badge-medium { @apply bg-yellow-900/60 text-yellow-300 text-xs px-2 py-0.5 rounded-full font-medium border border-yellow-800; }
+  .badge-high   { @apply bg-red-900/60 text-red-300 text-xs px-2 py-0.5 rounded-full font-medium border border-red-800; }
+  .badge-severe { @apply bg-red-950 text-red-200 text-xs px-2 py-0.5 rounded-full font-medium border border-red-700; }
 }
 
 /* Leaflet map dark theme override */
