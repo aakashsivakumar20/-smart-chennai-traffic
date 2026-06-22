@@ -10,12 +10,17 @@ import math
 from datetime import datetime
 from typing import Dict
 
+import httpx
+
+from config import settings
 from models.traffic import (
     TrafficReading, VehicleCount, CongestionLevel,
     TrafficAlert, AlertType
 )
 from models.zones import CHENNAI_ZONES
 from websocket.manager import connection_manager
+
+TOMTOM_REFRESH_INTERVAL = 600  # 10 minutes — keeps usage under free tier limit
 
 # Chennai peak hours (morning rush + evening rush)
 PEAK_HOURS = {7, 8, 9, 17, 18, 19, 20}
@@ -115,32 +120,56 @@ def generate_zone_reading(zone) -> TrafficReading:
 
 
 class TrafficSimulator:
-    """Continuously generates traffic data and pushes via WebSocket"""
+    """
+    Broadcasts live traffic data every 3 seconds via WebSocket.
+    If TOMTOM_API_KEY is set, real speed/congestion data is fetched every 10 minutes
+    and blended in. Otherwise falls back to simulation for all zones.
+    """
 
     def __init__(self):
         self.running = False
         self._task = None
+        self._tomtom_task = None
         self.latest: Dict[str, TrafficReading] = {}
 
     async def start(self):
         self.running = True
         self._task = asyncio.create_task(self._loop())
-        print("✅ Traffic simulator started")
+        if settings.TOMTOM_API_KEY:
+            self._tomtom_task = asyncio.create_task(self._tomtom_loop())
+            print("✅ Traffic simulator started with TomTom live data")
+        else:
+            print("✅ Traffic simulator started (simulated — set TOMTOM_API_KEY for real data)")
 
     async def stop(self):
         self.running = False
         if self._task:
             self._task.cancel()
+        if self._tomtom_task:
+            self._tomtom_task.cancel()
+
+    async def _tomtom_loop(self):
+        from services.tomtom import fetch_zone_flow, flow_to_reading
+        async with httpx.AsyncClient() as client:
+            while self.running:
+                for zone in CHENNAI_ZONES:
+                    flow = await fetch_zone_flow(zone, client)
+                    if flow:
+                        self.latest[zone.id] = flow_to_reading(zone, flow)
+                print(f"TomTom refresh complete — {len(self.latest)} zones updated")
+                await asyncio.sleep(TOMTOM_REFRESH_INTERVAL)
 
     async def _loop(self):
         while self.running:
             readings = []
             for zone in CHENNAI_ZONES:
-                reading = generate_zone_reading(zone)
-                self.latest[zone.id] = reading
-                readings.append(reading.model_dump(mode="json"))
+                # Use TomTom reading if available, otherwise simulate
+                if zone.id not in self.latest:
+                    self.latest[zone.id] = generate_zone_reading(zone)
+                elif not settings.TOMTOM_API_KEY:
+                    self.latest[zone.id] = generate_zone_reading(zone)
+                readings.append(self.latest[zone.id].model_dump(mode="json"))
 
-            # Occasionally generate an alert
             alert = self._maybe_generate_alert()
 
             payload = {
@@ -151,7 +180,7 @@ class TrafficSimulator:
             }
 
             await connection_manager.broadcast(payload)
-            await asyncio.sleep(3)  # Update every 3 seconds
+            await asyncio.sleep(3)
 
     def _maybe_generate_alert(self):
         if random.random() > 0.92:  # ~8% chance per tick

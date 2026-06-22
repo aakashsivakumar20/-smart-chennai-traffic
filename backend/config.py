@@ -34,6 +34,9 @@ class Settings:
     # Simulator tick rate (seconds between traffic updates)
     SIMULATOR_INTERVAL: float = float(os.getenv("SIMULATOR_INTERVAL", "3.0"))
 
+    # TomTom Traffic API (optional — set to enable real traffic data)
+    TOMTOM_API_KEY: str = os.getenv("TOMTOM_API_KEY", "")
+
     # Future: database / redis (Phase 2)
     DATABASE_URL: str = os.getenv("DATABASE_URL", "")
     REDIS_URL: str = os.getenv("REDIS_URL", "")
