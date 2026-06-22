@@ -1,0 +1,10 @@
+# Phase 1 (no GPU needed)
+opencv-python==4.8.1.78
+requests==2.31.0
+numpy==1.26.2
+
+# Phase 2 (requires Python 3.10+, ideally a GPU)
+# ultralytics==8.0.200   # YOLOv8
+# torch==2.1.0
+# torchvision==0.16.0
+# deep-sort-realtime==1.3.2

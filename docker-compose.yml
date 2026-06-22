@@ -1,0 +1,58 @@
+version: '3.9'
+
+services:
+
+  # ── FastAPI Backend ──────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../docker/Dockerfile.backend
+    container_name: chennai-backend
+    ports:
+      - "8000:8000"
+    env_file: .env
+    volumes:
+      - ./backend:/app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ── React Frontend ───────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/Dockerfile.frontend
+    container_name: chennai-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # ── Redis Cache ──────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: chennai-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  # ── PostgreSQL ───────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: chennai-postgres
+    environment:
+      POSTGRES_DB: chennai_traffic
+      POSTGRES_USER: traffic_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-securepassword}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

@@ -1,0 +1,89 @@
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+*.log
+
+# ========================
+# Node / React
+# ========================
+node_modules/
+dist/
+.next/
+.cache/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ========================
+# Environment Variables (NEVER commit these)
+# ========================
+.env
+.env.local
+.env.production
+.env.development
+
+# ========================
+# AI Model Files (too large for GitHub)
+# ========================
+*.pt
+*.pth
+*.onnx
+*.weights
+*.cfg
+runs/
+datasets/
+
+# ========================
+# Database
+# ========================
+*.db
+*.sqlite3
+*.sql.bak
+
+# ========================
+# Docker
+# ========================
+docker-compose.override.yml
+
+# ========================
+# OS Files
+# ========================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ========================
+# IDE
+# ========================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ========================
+# Video / Media (too large)
+# ========================
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.jpg
+*.jpeg
+*.png
+!frontend/src/assets/**
+!frontend/public/**
