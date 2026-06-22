@@ -1,5 +1,7 @@
 # Smart Chennai Traffic Management System
 
+**Live:** [smart-chennai-traffic.vercel.app](https://smart-chennai-traffic.vercel.app) — API: [smart-chennai-traffic-backend.onrender.com](https://smart-chennai-traffic-backend.onrender.com)
+
 An AI-powered, real-time traffic monitoring and congestion optimization platform for Chennai. Monitors vehicle density across 12 junctions, classifies congestion, optimizes signal timing dynamically, and streams live updates to a React dashboard.
 
 ## Tech Stack
