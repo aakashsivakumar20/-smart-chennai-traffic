@@ -15,6 +15,7 @@ from logging_config import logger
 from api.traffic import router as traffic_router
 from api.signals import router as signals_router
 from api.analytics import router as analytics_router
+from api.weather import router as weather_router
 from websocket.manager import router as ws_router
 from services.simulator import TrafficSimulator
 
@@ -84,9 +85,10 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 
 # ── Routes ───────────────────────────────────────────────────
-app.include_router(traffic_router, prefix="/api/traffic", tags=["Traffic"])
-app.include_router(signals_router, prefix="/api/signals", tags=["Signals"])
+app.include_router(traffic_router,   prefix="/api/traffic",   tags=["Traffic"])
+app.include_router(signals_router,   prefix="/api/signals",   tags=["Signals"])
 app.include_router(analytics_router, prefix="/api/analytics", tags=["Analytics"])
+app.include_router(weather_router,   prefix="/api/weather",   tags=["Weather"])
 app.include_router(ws_router, tags=["WebSocket"])
 
 
