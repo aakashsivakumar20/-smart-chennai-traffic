@@ -1,19 +1,20 @@
 import { useState } from 'react'
-import { AlertCircle, X } from 'lucide-react'
+import { Navigation, X } from 'lucide-react'
 
-const ALTERNATIVES = {
-  kathipara:     ['Guindy', 'Velachery'],
-  koyambedu:    ['Porur Junction', 'Anna Salai / LB Road'],
-  tnagar:       ['Anna Salai / LB Road', 'Adyar Signal'],
-  annasalai:    ['T Nagar Pondy Bazaar', 'Marina Beach Road'],
-  omr_perungudi:['OMR Sholinganallur', 'Velachery Main Road'],
-  omr_sholing:  ['OMR Perungudi Toll', 'Adyar Signal'],
-  velachery:    ['Guindy Industrial Estate', 'Tambaram Sanatorium'],
-  guindy:       ['Kathipara Junction', 'Velachery Main Road'],
-  porur:        ['Koyambedu Signal', 'Tambaram Sanatorium'],
-  tambaram:     ['Velachery Main Road', 'Porur Junction'],
-  marina:       ['Anna Salai / LB Road', 'Adyar Signal'],
-  adyar:        ['Marina Beach Road', 'OMR Perungudi Toll'],
+// Geographically accurate road alternatives for each junction
+const ROUTES = {
+  kathipara:     { avoid: 'Kathipara Flyover',         take: 'Inner Ring Road',                  tip: 'bypasses the interchange entirely' },
+  koyambedu:    { avoid: 'Koyambedu Signal',           take: 'Poonamalle High Road',             tip: 'less congested parallel route'     },
+  tnagar:       { avoid: 'T Nagar Pondy Bazaar',       take: 'Venkatnarayana Road',              tip: 'avoids the shopping district'      },
+  annasalai:    { avoid: 'Anna Salai',                 take: 'Pantheon Road via Nungambakkam',  tip: 'parallel route, usually clear'     },
+  omr_perungudi:{ avoid: 'OMR Perungudi Toll',         take: 'OMR Service Road',                 tip: 'skip the toll stretch'             },
+  omr_sholing:  { avoid: 'OMR Sholinganallur',         take: 'Sholinganallur–Medavakkam Link Rd',tip: 'cuts through without OMR'          },
+  velachery:    { avoid: 'Velachery Main Road',        take: 'Taramani Link Road',               tip: '100 Feet Road also an option'      },
+  guindy:       { avoid: 'Guindy Industrial Estate',   take: 'Sardar Patel Road',                tip: 'avoids the industrial area signal' },
+  porur:        { avoid: 'Porur Junction',             take: 'Arcot Road',                       tip: 'use Mount–Poonamalle alternate'    },
+  tambaram:     { avoid: 'Tambaram Sanatorium',        take: 'GST Road service lane',            tip: 'Pallavaram bypass also available'  },
+  marina:       { avoid: 'Marina Beach Road',          take: 'Kamarajar Salai',                  tip: 'or try Triplicane High Road'       },
+  adyar:        { avoid: 'Adyar Signal',               take: 'Lattice Bridge Road',              tip: 'Canal Bank Road also works'        },
 }
 
 export default function RouteAlert({ zones }) {
@@ -23,7 +24,7 @@ export default function RouteAlert({ zones }) {
     .filter(z =>
       ['high', 'severe'].includes(z.congestion_level) &&
       !dismissed.includes(z.zone_id) &&
-      ALTERNATIVES[z.zone_id]
+      ROUTES[z.zone_id]
     )
     .slice(0, 2)
 
@@ -32,28 +33,27 @@ export default function RouteAlert({ zones }) {
   return (
     <div className="space-y-2">
       {congested.map(zone => {
-        const alts = ALTERNATIVES[zone.zone_id]
+        const route = ROUTES[zone.zone_id]
         const isSevere = zone.congestion_level === 'severe'
         return (
           <div
             key={zone.zone_id}
-            className={`flex items-center gap-3 px-4 py-2.5 rounded-xl border text-sm animate-fade-in ${
+            className={`flex items-start gap-3 px-4 py-2.5 rounded-xl border text-sm animate-fade-in ${
               isSevere
                 ? 'bg-red-900/40 border-red-800 text-red-300'
                 : 'bg-orange-900/40 border-orange-800 text-orange-300'
             }`}
           >
-            <AlertCircle size={15} className="shrink-0" />
-            <p className="flex-1 min-w-0">
-              <span className="font-medium">{zone.zone_name}</span>
-              <span className="text-gray-400"> {isSevere ? 'severely congested' : 'congested'} — try </span>
-              <span className="font-medium">{alts[0]}</span>
-              <span className="text-gray-400"> or </span>
-              <span className="font-medium">{alts[1]}</span>
+            <Navigation size={15} className="shrink-0 mt-0.5" />
+            <p className="flex-1 min-w-0 leading-relaxed">
+              <span className="font-medium">{route.avoid}</span>
+              <span className="text-gray-400"> {isSevere ? 'severely congested' : 'congested'} — take </span>
+              <span className="font-medium">{route.take}</span>
+              <span className="text-gray-500 text-xs ml-1">({route.tip})</span>
             </p>
             <button
               onClick={() => setDismissed(d => [...d, zone.zone_id])}
-              className="shrink-0 opacity-60 hover:opacity-100 transition-opacity"
+              className="shrink-0 opacity-60 hover:opacity-100 transition-opacity mt-0.5"
             >
               <X size={13} />
             </button>

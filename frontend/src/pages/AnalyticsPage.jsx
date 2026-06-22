@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { ArrowLeft, TrendingUp, Clock, MapPin, Zap } from 'lucide-react'
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip,
-  ResponsiveContainer, CartesianGrid, Cell,
+  ResponsiveContainer, CartesianGrid, Cell, ReferenceArea,
 } from 'recharts'
 import { useAnalytics }     from '../hooks/useAnalytics'
 import { useTrafficSocket } from '../hooks/useTrafficSocket'
@@ -81,7 +81,7 @@ export default function AnalyticsPage() {
         <div className="card">
           <div className="mb-4">
             <h2 className="text-sm font-semibold text-white">24-Hour Traffic Pattern</h2>
-            <p className="text-xs text-gray-500 mt-0.5">Average vehicle count — red dots mark peak hours</p>
+            <p className="text-xs text-gray-500 mt-0.5">Average vehicle count — shaded areas are peak hours (7–9am, 5–8pm)</p>
           </div>
           {loading ? (
             <div className="h-64 bg-gray-800/60 rounded-lg animate-pulse" />
@@ -98,17 +98,16 @@ export default function AnalyticsPage() {
                 <XAxis dataKey="label" tick={{ fill: '#6b7280', fontSize: 10 }} axisLine={false} tickLine={false} interval={2} />
                 <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} axisLine={false} tickLine={false} />
                 <Tooltip content={<AreaTooltip />} />
+                <ReferenceArea x1="07:00" x2="09:00" fill="#ef4444" fillOpacity={0.08} />
+                <ReferenceArea x1="17:00" x2="20:00" fill="#ef4444" fillOpacity={0.08} />
                 <Area
                   type="monotone"
                   dataKey="avg_vehicles"
                   stroke="#3b82f6"
                   strokeWidth={2}
                   fill="url(#grad)"
-                  dot={({ cx, cy, payload }) =>
-                    payload.peak
-                      ? <circle key={cx} cx={cx} cy={cy} r={4} fill="#ef4444" stroke="#111827" strokeWidth={2} />
-                      : <circle key={cx} cx={cx} cy={cy} r={2} fill="#3b82f6" />
-                  }
+                  dot={{ r: 2, fill: '#3b82f6', strokeWidth: 0 }}
+                  activeDot={{ r: 5, fill: '#60a5fa' }}
                 />
               </AreaChart>
             </ResponsiveContainer>
