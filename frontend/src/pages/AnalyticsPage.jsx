@@ -98,8 +98,8 @@ export default function AnalyticsPage() {
                 <XAxis dataKey="label" tick={{ fill: '#6b7280', fontSize: 10 }} axisLine={false} tickLine={false} interval={2} />
                 <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} axisLine={false} tickLine={false} />
                 <Tooltip content={<AreaTooltip />} />
-                <ReferenceArea x1="07:00" x2="09:00" fill="#ef4444" fillOpacity={0.08} />
-                <ReferenceArea x1="17:00" x2="20:00" fill="#ef4444" fillOpacity={0.08} />
+                <ReferenceArea x1="07:00" x2="09:00" fill="#ef4444" fillOpacity={0.18} />
+                <ReferenceArea x1="17:00" x2="20:00" fill="#ef4444" fillOpacity={0.18} />
                 <Area
                   type="monotone"
                   dataKey="avg_vehicles"
