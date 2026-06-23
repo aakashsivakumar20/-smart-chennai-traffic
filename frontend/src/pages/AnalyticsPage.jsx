@@ -29,7 +29,7 @@ function AreaTooltip({ active, payload, label }) {
 }
 
 export default function AnalyticsPage() {
-  const { history, summary, prediction, loading } = useAnalytics()
+  const { history, summary, prediction, loading, error } = useAnalytics()
   const { zones } = useTrafficSocket()
 
   const topZones = [...zones]
@@ -85,7 +85,7 @@ export default function AnalyticsPage() {
           </div>
           {loading ? (
             <div className="h-64 bg-gray-800/60 rounded-lg animate-pulse" />
-          ) : (
+          ) : history.length > 0 ? (
             <ResponsiveContainer width="100%" height={260}>
               <AreaChart data={history} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
                 <defs>
@@ -111,6 +111,10 @@ export default function AnalyticsPage() {
                 />
               </AreaChart>
             </ResponsiveContainer>
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-500 text-sm">
+              {error ?? 'No historical data available'}
+            </div>
           )}
         </div>
 
@@ -144,7 +148,11 @@ export default function AnalyticsPage() {
             <h2 className="text-sm font-semibold text-white mb-1">Traffic Prediction</h2>
             <p className="text-xs text-gray-500 mb-4">Based on historical Chennai peak hour patterns</p>
 
-            {prediction ? (
+            {loading ? (
+              <div className="space-y-3">
+                {[...Array(2)].map((_, i) => <div key={i} className="h-16 bg-gray-800/60 rounded-lg animate-pulse" />)}
+              </div>
+            ) : prediction ? (
               <div className="space-y-5">
                 {prediction.predictions.map(p => (
                   <div key={p.hour}>
@@ -172,8 +180,8 @@ export default function AnalyticsPage() {
                 </div>
               </div>
             ) : (
-              <div className="space-y-3">
-                {[...Array(2)].map((_, i) => <div key={i} className="h-16 bg-gray-800/60 rounded-lg animate-pulse" />)}
+              <div className="h-32 flex items-center justify-center text-gray-500 text-sm">
+                {error ?? 'Prediction data unavailable'}
               </div>
             )}
           </div>
